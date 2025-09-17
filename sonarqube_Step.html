@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonarQube GitHub Actions Integration</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #7f8c8d;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .flowchart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .branch {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
+            max-width: 450px;
+        }
+        .branch-title {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .feature .branch-title { background: #e8f4fd; color: #2980b9; }
+        .development .branch-title { background: #e8f8ef; color: #27ae60; }
+        .integration .branch-title { background: #fef9e7; color: #f39c12; }
+        .release .branch-title { background: #fdebd0; color: #d35400; }
+        .master .branch-title { background: #f2e6f2; color: #8e44ad; }
+        .steps {
+            margin-left: 20px;
+        }
+        .steps li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .trigger-section {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .trigger-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .pr-trigger { border-left: 4px solid #3498db; }
+        .push-trigger { border-left: 4px solid #9b59b6; }
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+        .code-example pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .mermaid-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        .quality-gate {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+        }
+        .quality-gate h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .flowchart-container {
+                flex-direction: column;
+            }
+            .branch {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SonarQube Integration in GitHub Actions</h1>
+            <p class="description">
+                This detailed visualization shows PR and push strategies for SonarQube integration across Git branches in a GitHub Actions pipeline. 
+                Each branch has specific quality checks and gates to ensure code quality throughout the development lifecycle.
+            </p>
+        </header>
+
+        <div class="mermaid-container">
+            <div class="mermaid">
+flowchart TD
+    A[Start GitHub Actions Pipeline] --> B{Check Branch};
+
+    subgraph FeatureBranch[Feature Branch]
+        direction TB
+        F1{Trigger Type} --> F2[PR to Development];
+        F1 --> F3[Push to Feature];
+        
+        subgraph PRFlow[PR Analysis Flow]
+            F2 --> F4[Run SonarQube PR Analysis];
+            F4 --> F5[Post Quality Gate Status as PR Comment];
+            F5 --> F6[Block Merge if Quality Gate Fails];
+            F6 --> F7[Notify Developers];
+        end
+        
+        subgraph PushFlow[Push Analysis Flow]
+            F3 --> F8[Run Quick SonarQube Analysis];
+            F8 --> F9[Generate Local Report];
+            F9 --> F10[Provide Early Feedback];
+        end
+    end
+
+    subgraph DevelopmentBranch[Development Branch]
+        direction TB
+        D1{Trigger Type} --> D2[PR to Integration];
+        D1 --> D3[Push to Development];
+        
+        subgraph PRFlowDev[PR Analysis Flow]
+            D2 --> D4[Run SonarQube PR Analysis];
+            D4 --> D5[Enforce Quality Gate];
+            D5 --> D6[Block Merge if Quality Gate Fails];
+            D6 --> D7[Notify Team];
+        end
+        
+        subgraph PushFlowDev[Push Analysis Flow]
+            D3 --> D8[Run Full SonarQube Analysis];
+            D8 --> D9[Check Quality Gate Status];
+            D9 --> D10{Fail Build?};
+            D10 -- Yes --> D11[Fail Pipeline & Notify Team];
+            D10 -- No --> D12[Proceed with Pipeline];
+        end
+    end
+
+    subgraph IntegrationBranch[Integration Branch]
+        direction TB
+        I1{Trigger Type} --> I2[PR to Release];
+        I1 --> I3[Push to Integration];
+        
+        subgraph PRFlowInt[PR Analysis Flow]
+            I2 --> I4[Run Full Analysis with Extended Rules];
+            I4 --> I5[Enforce Stricter Quality Gate];
+            I5 --> I6[Block Merge if Quality Gate Fails];
+            I6 --> I7[Notify Release Manager];
+        end
+        
+        subgraph PushFlowInt[Push Analysis Flow]
+            I3 --> I8[Run Full Analysis with Extended Rules];
+            I8 --> I9[Enforce Stricter Quality Gate];
+            I9 --> I10{Fail Build?};
+            I10 -- Yes --> I11[Fail Pipeline & Alert];
+            I10 -- No --> I12[Generate Deployment Artifact];
+        end
+    end
+
+    subgraph ReleaseBranch[Release Branch]
+        direction TB
+        R1{Trigger Type} --> R2[PR to Master];
+        R1 --> R3[Push to Release];
+        
+        subgraph PRFlowRel[PR Analysis Flow]
+            R2 --> R4[Run Analysis with Security Focus];
+            R4 --> R5[Check for Zero Critical Bugs];
+            R5 --> R6[Block Merge if Quality Gate Fails];
+            R6 --> R7[Notify Security Team];
+        end
+        
+        subgraph PushFlowRel[Push Analysis Flow]
+            R3 --> R8[Run Analysis with Security Focus];
+            R8 --> R9[Check for Zero Critical Bugs];
+            R9 --> R10{Fail Build?};
+            R10 -- Yes --> R11[Immediate Rollback & Fix];
+            R10 -- No --> R12[Tag Version & Deploy to Staging];
+        end
+    end
+
+    subgraph MasterBranch[Master/Main Branch]
+        direction TB
+        M1[Trigger: Push] --> M2[Run Analysis & Compare with Previous];
+        M2 --> M3[Verify Quality Gate Pass];
+        M3 --> M4[Publish Results to Dashboard];
+        M4 --> M5[Deploy to Production];
+        M5 --> M6[Notify Stakeholders];
+    end
+
+    B -- Feature --> FeatureBranch;
+    B -- Development --> DevelopmentBranch;
+    B -- Integration --> IntegrationBranch;
+    B -- Release --> ReleaseBranch;
+    B -- Master --> MasterBranch;
+            </div>
+        </div>
+
+        <div class="flowchart-container">
+            <!-- Feature Branch -->
+            <div class="branch feature">
+                <h2 class="branch-title">Feature Branch</h2>
+                
+                <div class="trigger-section pr-trigger">
+                    <div class="trigger-title">PR Trigger (to Development)</div>
+                    <ul class="steps">
+                        <li>Run SonarQube PR Analysis (Preview Mode)</li>
+                        <li>Focus on new code quality only</li>
+                        <li>Post Quality Gate status as PR comment</li>
+                        <li>Block merge if Quality Gate fails</li>
+                        <li>Notify developers of issues</li>
+                    </ul>
+                </div>
+                
+                <div class="trigger-section push-trigger">
+                    <div class="trigger-title">Push Trigger</div>
+                    <ul class="steps">
+                        <li>Run quick SonarQube analysis</li>
+                        <li>Generate local report for developers</li>
+                        <li>Provide early feedback on code quality</li>
+                        <li>No pipeline blocking</li>
+                    </ul>
+                </div>
+                
+                <div class="quality-gate">
+                    <h3>Quality Gate Requirements:</h3>
+                    <ul>
+                        <li>No new critical bugs</li>
+                        <li>No new security vulnerabilities</li>
+                        <li>Code coverage on new code ≥ 70%</li>
+                    </ul>
+                </div>
+                
+                <div class="code-example">
+<pre># PR Analysis Example
+- name: SonarQube PR Analysis
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.pullrequest.base=development
+      -Dsonar.pullrequest.branch=${{ github.head_ref }}
+      -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+      -Dsonar.qualitygate.wait=true
+
+# Quality Gate Check
+- name: SonarQube Quality Gate Check
+  uses: SonarSource/sonarqube-quality-gate-action@v1
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}</pre>
+                </div>
+            </div>
+
+            <!-- Development Branch -->
+            <div class="branch development">
+                <h2 class="branch-title">Development Branch</h2>
+                
+                <div class="trigger-section pr-trigger">
+                    <div class="trigger-title">PR Trigger (to Integration)</div>
+                    <ul class="steps">
+                        <li>Run SonarQube PR Analysis</li>
+                        <li>Enforce Quality Gate requirements</li>
+                        <li>Block merge if Quality Gate fails</li>
+                        <li>Notify team of quality issues</li>
+                        <li>Generate detailed report</li>
+                    </ul>
+                </div>
+                
+                <div class="trigger-section push-trigger">
+                    <div class="trigger-title">Push Trigger</div>
+                    <ul class="steps">
+                        <li>Run full SonarQube analysis</li>
+                        <li>Check Quality Gate status</li>
+                        <li>Fail pipeline if Quality Gate fails</li>
+                        <li>Proceed with pipeline if passed</li>
+                        <li>Generate deployment artifact</li>
+                    </ul>
+                </div>
+                
+                <div class="quality-gate">
+                    <h3>Quality Gate Requirements:</h3>
+                    <ul>
+                        <li>Zero critical bugs</li>
+                        <li>Zero security vulnerabilities</li>
+                        <li>Code coverage ≥ 70%</li>
+                        <li>Duplication ≤ 5%</li>
+                    </ul>
+                </div>
+                
+                <div class="code-example">
+<pre># PR Analysis Example
+- name: SonarQube PR Analysis
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.pullrequest.base=integration
+      -Dsonar.pullrequest.branch=${{ github.head_ref }}
+      -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+      -Dsonar.qualitygate.wait=true
+
+# Push Analysis Example
+- name: SonarQube Full Analysis
+  if: github.event_name == 'push'
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.branch.name=development
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml</pre>
+                </div>
+            </div>
+
+            <!-- Integration Branch -->
+            <div class="branch integration">
+                <h2 class="branch-title">Integration Branch</h2>
+                
+                <div class="trigger-section pr-trigger">
+                    <div class="trigger-title">PR Trigger (to Release)</div>
+                    <ul class="steps">
+                        <li>Run full analysis with extended rules</li>
+                        <li>Enforce stricter Quality Gate thresholds</li>
+                        <li>Block merge if stricter criteria not met</li>
+                        <li>Notify release manager</li>
+                        <li>Generate security report</li>
+                    </ul>
+                </div>
+                
+                <div class="trigger-section push-trigger">
+                    <div class="trigger-title">Push Trigger</div>
+                    <ul class="steps">
+                        <li>Run full analysis with extended rules</li>
+                        <li>Enforce stricter Quality Gate thresholds</li>
+                        <li>Fail pipeline if stricter criteria not met</li>
+                        <li>Generate deployment artifact if passed</li>
+                        <li>Run performance tests</li>
+                    </ul>
+                </div>
+                
+                <div class="quality-gate">
+                    <h3>Quality Gate Requirements:</h3>
+                    <ul>
+                        <li>Zero critical & major bugs</li>
+                        <li>Zero security vulnerabilities</li>
+                        <li>Code coverage ≥ 80%</li>
+                        <li>Duplication ≤ 3%</li>
+                    </ul>
+                </div>
+                
+                <div class="code-example">
+<pre># PR Analysis Example
+- name: SonarQube PR Analysis
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.pullrequest.base=release
+      -Dsonar.pullrequest.branch=${{ github.head_ref }}
+      -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.java.codeCoveragePlugin=jacoco
+      -Dsonar.coverage.exclusions=**/test/**,**/generated/**
+
+# Quality Gate Check with timeout
+- name: SonarQube Quality Gate Check
+  uses: SonarSource/sonarqube-quality-gate-action@v1
+  timeout-minutes: 10
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}</pre>
+                </div>
+            </div>
+
+            <!-- Release Branch -->
+            <div class="branch release">
+                <h2 class="branch-title">Release Branch</h2>
+                
+                <div class="trigger-section pr-trigger">
+                    <div class="trigger-title">PR Trigger (to Master)</div>
+                    <ul class="steps">
+                        <li>Run analysis with security focus</li>
+                        <li>Check for zero critical bugs</li>
+                        <li>Block merge if Quality Gate fails</li>
+                        <li>Notify security team</li>
+                        <li>Generate compliance report</li>
+                    </ul>
+                </div>
+                
+                <div class="trigger-section push-trigger">
+                    <div class="trigger-title">Push Trigger</div>
+                    <ul class="steps">
+                        <li>Run analysis with security focus</li>
+                        <li>Check for zero critical bugs</li>
+                        <li>Immediate rollback if Quality Gate fails</li>
+                        <li>Tag version and deploy to staging if passed</li>
+                        <li>Run penetration tests</li>
+                    </ul>
+                </div>
+                
+                <div class="quality-gate">
+                    <h3>Quality Gate Requirements:</h3>
+                    <ul>
+                        <li>Zero bugs</li>
+                        <li>Zero vulnerabilities</li>
+                        <li>Zero security hotspots</li>
+                        <li>Code coverage ≥ 85%</li>
+                    </ul>
+                </div>
+                
+                <div class="code-example">
+<pre># PR Analysis Example
+- name: SonarQube PR Analysis
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.pullrequest.base=master
+      -Dsonar.pullrequest.branch=${{ github.head_ref }}
+      -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.securityReport.export.path=./security-report.json
+      -Dsonar.analysis.securityMode=advanced
+
+# Push Analysis Example
+- name: SonarQube Release Check
+  if: github.event_name == 'push'
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.branch.name=release/*
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.securityReport.export.path=./security-report.json
+      -Dsonar.analysis.securityMode=advanced</pre>
+                </div>
+            </div>
+
+            <!-- Master Branch -->
+            <div class="branch master">
+                <h2 class="branch-title">Master Branch</h2>
+                
+                <div class="trigger-section push-trigger">
+                    <div class="trigger-title">Push Trigger</div>
+                    <ul class="steps">
+                        <li>Run full analysis with version tracking</li>
+                        <li>Compare with previous version for regression</li>
+                        <li>Verify Quality Gate pass</li>
+                        <li>Publish results to SonarQube dashboard</li>
+                        <li>Deploy to production if Quality Gate passes</li>
+                        <li>Notify stakeholders of deployment</li>
+                    </ul>
+                </div>
+                
+                <div class="quality-gate">
+                    <h3>Quality Gate Requirements:</h3>
+                    <ul>
+                        <li>Zero bugs</li>
+                        <li>Zero vulnerabilities</li>
+                        <li>Code coverage ≥ 85%</li>
+                        <li>All technical debt addressed</li>
+                    </ul>
+                </div>
+                
+                <div class="code-example">
+<pre># Push Analysis Example
+- name: SonarQube Master Analysis
+  if: github.event_name == 'push'
+  uses: SonarSource/sonarqube-scan-action@v3
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  with:
+    args: >
+      -Dsonar.branch.name=master
+      -Dsonar.projectVersion=${{ github.sha }}
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+      -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+
+# Quality Gate Check with longer timeout
+- name: SonarQube Quality Gate Check
+  uses: SonarSource/sonarqube-quality-gate-action@v1
+  timeout-minutes: 15
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}</pre>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>SonarQube GitHub Actions Integration Flowchart | End-to-End PR and Push Strategies with Quality Gates</p>
+        </footer>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
